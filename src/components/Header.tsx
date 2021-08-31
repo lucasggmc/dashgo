@@ -68,7 +68,7 @@ export function Header() {
             
                 <Flex align="center">
                     <Box mr="4" textAlign="right">
-                        <Text>Lucas</Text>
+                        <Text>Lucas Carneiro</Text>
                         <Text 
                             color="gray.300" 
                             fontSize="small"
