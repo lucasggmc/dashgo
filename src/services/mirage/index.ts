@@ -1,13 +1,13 @@
-import { createServer, Model } from 'miragejs';
-
+import { createServer, Factory, Model } from 'miragejs';
+import faker from 'faker';
 
 type User = {
     name: string;
     email: string;
-    created_at: string; 
+    created_at: string;
 }
 
-export function makeServer(){
+export function makeServer() {
     const server = createServer({
         models: {
             //Partial possibilita que nem todos os campos da tipagem 
@@ -17,7 +17,25 @@ export function makeServer(){
             })
         },
 
-        routes(){
+        factories: {
+            user: Factory.extend({
+                name(i: number) {
+                    return `Lucas ${i + 1}`
+                },
+                email() {
+                    return faker.internet.email().toLowerCase();
+                },
+                createdAt() {
+                    return faker.date.recent(10);
+                }
+            })
+        },
+
+        seeds(server){
+            server.createList('user', 200);
+        },
+
+        routes() {
             this.namespace = 'api';
             this.timing = 750;
             //Shorthands do Mirage, dessa forma é feito uma automatização,
