@@ -1,20 +1,14 @@
 import { Box, Button, Checkbox, Flex, Heading, Icon, Table, Tbody, Td, Text, Th, Thead, Tr, useBreakpointValue, Spinner } from "@chakra-ui/react";
 import Link from "next/link";
-import { RiAddLine, RiPencilLine } from "react-icons/ri";
-import { useQuery } from 'react-query';
-import { useEffect } from "react";
+import { RiAddLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 
 import { Sidebar } from "../../components/Sidebar";
+import { useUsers } from "../../services/hooks/useUsers";
 
 export default function UserList() {
-    const { data, isLoading, error } = useQuery('users', async () => {
-        const response = await fetch('http://localhost:3000/api/users');
-        const data = await response.json();
-
-        return data;
-    });
+    const { data, isLoading, isFetching, error } = useUsers();
 
 
     const isWideVersion = useBreakpointValue({
@@ -31,7 +25,12 @@ export default function UserList() {
 
                 <Box flex="1" borderRadius={8} bg="gray.800" p="8">
                     <Flex mb="8" justify="space-between" align="center">
-                        <Heading size="lg" fontWeight="normal">Usuários</Heading>
+                        <Heading size="lg" fontWeight="normal">
+                            Usuários
+                            {
+                                !isLoading && isFetching && <Spinner sm="sl" color="gray.500" ml="4"/>
+                            }
+                        </Heading>
 
                         <Link href="/users/create" passHref>
                             <Button
@@ -70,33 +69,30 @@ export default function UserList() {
                                     </Thead>
 
                                     <Tbody>
-                                        <Tr>
-                                            <Td px={["4", "4", "6"]}>
-                                                <Checkbox colorScheme="pink" />
-                                            </Td>
-                                            <Td>
-                                                <Box>
-                                                    <Text fontWeight="bold">Lucas Carneiro</Text>
-                                                    <Text fontSize="sm" color="gray.300">luasdasda@asdas.com</Text>
-                                                </Box>
-                                            </Td>
-                                            {isWideVersion && <Td>04 de abril, 2021</Td>}
-                                            {/* <Td>
-                                    <Button 
-                                        as="a" 
-                                        size="sm" 
-                                        fontSize="sm" 
-                                        colorScheme="purple" 
-                                        leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                                    >
-                                        { isWideVersion ? "Editar" : "" }
-                                    </Button>
-                                </Td> */}
-                                        </Tr>
+                                        {
+                                            data.map(user => (
+                                                <Tr key={user.id}>
+                                                    <Td px={["4", "4", "6"]}>
+                                                        <Checkbox colorScheme="pink" />
+                                                    </Td>
+                                                    <Td>
+                                                        <Box>
+                                                            <Text fontWeight="bold">{user.name}</Text>
+                                                            <Text fontSize="sm" color="gray.300">{user.email}</Text>
+                                                        </Box>
+                                                    </Td>
+                                                    {isWideVersion && <Td>{user.createdAt}</Td>}
+                                                </Tr>
+                                            ))
+                                        }
                                     </Tbody>
                                 </Table>
 
-                                <Pagination />
+                                <Pagination 
+                                    totalCountOfRegisters={200}
+                                    currentPage={5}
+                                    onPageChange={() => {}}
+                                />
                             </>
                         )
                     }
